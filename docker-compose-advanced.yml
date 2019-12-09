@@ -10,7 +10,6 @@ networks:
   reverseproxy:
     external: true
     name: reverseproxy
-  internal:
 
 services:
   nginx-proxy:
@@ -22,7 +21,6 @@ services:
       - nginx-certs:/etc/nginx/certs
     networks:
       - reverseproxy
-      - internal
     labels:
       - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     ports:
@@ -37,29 +35,27 @@ services:
      - com.github.jrcs.letsencrypt_nginx_proxy_companion.docker_gen
     volumes:
       - nginx-conf:/etc/nginx/conf.d
-#      - nginx-vhost:/etc/nginx/vhost.d
-#      - public-html:/usr/share/nginx/html
+      - nginx-vhost:/etc/nginx/vhost.d
+      - public-html:/usr/share/nginx/html
       - nginx-certs:/etc/nginx/certs
       - nginx-tmpl:/etc/docker-gen/templates
       - /var/run/docker.sock:/tmp/docker.sock:ro
   nginx-proxy-letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
-    networks:
-      - internal
     environment:
       - DEFAULT_EMAIL=duvalhubbot@gmail.com
     volumes:
-#      - nginx-conf:/etc/nginx/conf.d
+      - nginx-conf:/etc/nginx/conf.d
       - nginx-vhost:/etc/nginx/vhost.d
       - public-html:/usr/share/nginx/html
       - nginx-certs:/etc/nginx/certs
       - /var/run/docker.sock:/var/run/docker.sock:ro
-  test-app:
-    image: nginxdemos/hello
-    deploy:
-      replicas: 4
-    environment:
-      - VIRTUAL_HOST=hello.testapp.dev.philippeduval.ca
-      - LETSENCRYPT_HOST=hello.testapp.dev.philippeduval.ca
-    networks:
-      - reverseproxy
+#  test-app:
+#    image: nginxdemos/hello
+#    deploy:
+#      replicas: 4
+#    environment:
+#      - VIRTUAL_HOST=hello.testapp.dev.philippeduval.ca
+#      - LETSENCRYPT_HOST=hello.testapp.dev.philippeduval.ca
+#    networks:
+#      - reverseproxy
